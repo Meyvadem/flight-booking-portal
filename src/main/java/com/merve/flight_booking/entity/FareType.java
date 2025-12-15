@@ -12,9 +12,19 @@ public class FareType {
 
     private String name; // LIGHT, ECO, PLUS
 
-    private int includedBaggageKg;
+    public Long getId() {
+        return id;
+    }
 
-    private double extraPrice;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    // getters & setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
