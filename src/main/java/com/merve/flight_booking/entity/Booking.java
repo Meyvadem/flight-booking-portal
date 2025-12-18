@@ -12,15 +12,15 @@ public class Booking {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "flight_id")
+    @JoinColumn(name = "flight_id", nullable = false)
     private Flight flight;
 
     @ManyToOne
-    @JoinColumn(name = "fare_type_id")
+    @JoinColumn(name = "fare_type_id", nullable = false)
     private FareType fareType;
 
     private int extraBaggageKg;
