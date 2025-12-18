@@ -1,6 +1,8 @@
 package com.merve.flight_booking.security;
 
 import jakarta.servlet.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,9 +18,10 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final CustomUserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
-    public JwtAuthFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
+    public JwtAuthFilter(JwtService jwtService,
+                         UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
     }
@@ -29,29 +32,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getServletPath();
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        // 🔴 AUTH endpoint’leri JWT'den MUAF
-        if (path.startsWith("/api/auth")) {
+        if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String auth = request.getHeader("Authorization");
+        String token = header.substring(7);
+        String email;
 
-        if (auth == null || !auth.startsWith("Bearer ")) {
+        try {
+            email = jwtService.extractSubject(token);
+        } catch (Exception e) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        String token = auth.substring(7);
-
-        if (!jwtService.isValid(token)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String email = jwtService.extractEmail(token);
 
         if (email != null &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -59,21 +55,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             UserDetails userDetails =
                     userDetailsService.loadUserByUsername(email);
 
-            UsernamePasswordAuthenticationToken authentication =
+            UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
                             userDetails.getAuthorities()
                     );
 
-            authentication.setDetails(
+            auth.setDetails(
                     new WebAuthenticationDetailsSource().buildDetails(request)
             );
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
         filterChain.doFilter(request, response);
     }
-
 }
+

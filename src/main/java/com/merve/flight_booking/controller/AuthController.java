@@ -40,7 +40,7 @@ public class AuthController {
 
         userRepository.save(u);
 
-        String token = jwtService.generateToken(u);
+        String token = jwtService.generateToken(u.getEmail());
         return ResponseEntity.ok(new AuthResponse(token, u.getRole().name()));
     }
 
@@ -54,7 +54,7 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
-        String token = jwtService.generateToken(u);
+        String token = jwtService.generateToken(u.getEmail());
         return ResponseEntity.ok(new AuthResponse(token, u.getRole().name()));
     }
 }

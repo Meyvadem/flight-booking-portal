@@ -13,45 +13,36 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private final SecretKey key;
+    private final byte[] keyBytes;
     private final long expirationMs;
 
     public JwtService(
             @Value("${app.jwt.secret}") String secret,
-            @Value("${app.jwt.expiration-ms:3600000}") long expirationMs
+            @Value("${app.jwt.expiration-ms}") long expirationMs
     ) {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.keyBytes = secret.getBytes(StandardCharsets.UTF_8);
         this.expirationMs = expirationMs;
     }
 
-    public String generateToken(User user) {
+    public String generateToken(String subject) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
-                .subject(user.getEmail())
-                .claim("role", user.getRole().name())
+                .subject(subject)
                 .issuedAt(now)
                 .expiration(exp)
-                .signWith(key)
+                .signWith(Keys.hmacShaKeyFor(keyBytes))
                 .compact();
     }
 
-    public String extractEmail(String token) {
+    public String extractSubject(String token) {
         return Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(Keys.hmacShaKeyFor(keyBytes))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
     }
-
-    public boolean isValid(String token) {
-        try {
-            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }
+
