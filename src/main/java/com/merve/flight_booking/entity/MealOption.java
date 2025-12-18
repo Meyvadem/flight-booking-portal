@@ -3,33 +3,28 @@ package com.merve.flight_booking.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "baggage_options")
-public class BaggageOption {
+@Table(name = "meal_options")
+public class MealOption {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int weightKg;
+    private String name;
+
     private double price;
 
     // getters & setters
-
-
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getName() {
+        return name;
     }
 
-    public int getWeightKg() {
-        return weightKg;
-    }
-
-    public void setWeightKg(int weightKg) {
-        this.weightKg = weightKg;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public double getPrice() {

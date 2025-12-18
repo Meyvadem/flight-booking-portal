@@ -4,7 +4,7 @@ public class BookingRequest {
 
     private Long flightId;
     private Long airlineFareTypeId;
-    private int extraBaggageKg; // şimdilik 0 gelecek
+
 
     public Long getFlightId() {
         return flightId;
@@ -22,11 +22,4 @@ public class BookingRequest {
         this.airlineFareTypeId = airlineFareTypeId;
     }
 
-    public int getExtraBaggageKg() {
-        return extraBaggageKg;
-    }
-
-    public void setExtraBaggageKg(int extraBaggageKg) {
-        this.extraBaggageKg = extraBaggageKg;
-    }
 }

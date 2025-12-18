@@ -11,6 +11,8 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // ---------------- CORE RELATIONS ----------------
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -23,7 +25,18 @@ public class Booking {
     @JoinColumn(name = "airline_fare_type_id", nullable = false)
     private AirlineFareType airlineFareType;
 
-    private int extraBaggageKg;
+    // ---------------- ANCILLARIES ----------------
+
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BookingBaggage baggage;
+
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BookingMeal meal;
+
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BookingSeat seat;
+
+    // ---------------- BOOKING INFO ----------------
 
     private double totalPrice;
 
@@ -32,15 +45,10 @@ public class Booking {
 
     private LocalDateTime bookingDate = LocalDateTime.now();
 
-
-    // getters & setters
+    // ---------------- GETTERS / SETTERS ----------------
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public User getUser() {
@@ -67,12 +75,28 @@ public class Booking {
         this.airlineFareType = airlineFareType;
     }
 
-    public int getExtraBaggageKg() {
-        return extraBaggageKg;
+    public BookingBaggage getBaggage() {
+        return baggage;
     }
 
-    public void setExtraBaggageKg(int extraBaggageKg) {
-        this.extraBaggageKg = extraBaggageKg;
+    public void setBaggage(BookingBaggage baggage) {
+        this.baggage = baggage;
+    }
+
+    public BookingMeal getMeal() {
+        return meal;
+    }
+
+    public void setMeal(BookingMeal meal) {
+        this.meal = meal;
+    }
+
+    public BookingSeat getSeat() {
+        return seat;
+    }
+
+    public void setSeat(BookingSeat seat) {
+        this.seat = seat;
     }
 
     public double getTotalPrice() {
@@ -93,9 +117,5 @@ public class Booking {
 
     public LocalDateTime getBookingDate() {
         return bookingDate;
-    }
-
-    public void setBookingDate(LocalDateTime bookingDate) {
-        this.bookingDate = bookingDate;
     }
 }
