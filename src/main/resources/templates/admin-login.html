@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Login</title>
+  <style>
+    body{font-family:system-ui;background:#0b1220;color:#e5e7eb;margin:0;display:grid;place-items:center;height:100vh}
+    .card{width:360px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:18px}
+    input{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:#e5e7eb}
+    button{width:100%;padding:10px;border:0;border-radius:12px;background:#2563eb;color:#fff;font-weight:600;cursor:pointer}
+    .muted{color:#9ca3af;font-size:13px}
+    .row{display:grid;gap:10px;margin-top:10px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 style="margin:0 0 6px 0;">Admin Login</h2>
+    <div class="muted">Thymeleaf form login</div>
+
+    <form method="post" action="/admin/login" class="row">
+      <input name="username" placeholder="Kullanıcı adı" />
+      <input name="password" type="password" placeholder="Şifre" />
+      <button type="submit">Giriş Yap</button>
+      <div class="muted" th:if="${param.error}">Hatalı kullanıcı adı/şifre</div>
+      <div class="muted" th:if="${param.logout}">Çıkış yapıldı</div>
+    </form>
+  </div>
+</body>
+</html>

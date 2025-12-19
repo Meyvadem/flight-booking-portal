@@ -2,12 +2,14 @@ package com.merve.flight_booking.security;
 
 import com.merve.flight_booking.entity.User;
 import com.merve.flight_booking.repository.UserRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Primary
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
