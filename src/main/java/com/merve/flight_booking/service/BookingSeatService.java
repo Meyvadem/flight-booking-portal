@@ -27,7 +27,7 @@ public class BookingSeatService {
 
     /**
      * Seat selection
-     * - Seat number zorunlu
+     * - Seat number opsiyonel (kontrolsüz)
      * - Aynı booking için tek seat
      */
     @Transactional
@@ -40,8 +40,10 @@ public class BookingSeatService {
             throw new RuntimeException("Confirmed booking cannot be modified");
         }
 
-        if (seatNumber == null || seatNumber.isBlank()) {
-            throw new RuntimeException("Seat number is required");
+        // ✅ seatNumber opsiyonel: null/blank ise null yap
+        String normalizedSeatNumber = null;
+        if (seatNumber != null && !seatNumber.isBlank()) {
+            normalizedSeatNumber = seatNumber.trim();
         }
 
         SeatOption option = seatOptionRepository.findById(seatOptionId)
@@ -53,7 +55,10 @@ public class BookingSeatService {
 
         seat.setBooking(booking);
         seat.setSeatOption(option);
-        seat.setSeatNumber(seatNumber);
+
+        // ✅ null olabilir
+        seat.setSeatNumber(normalizedSeatNumber);
+
         seat.setPrice(option.getPrice());
 
         bookingSeatRepository.save(seat);

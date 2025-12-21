@@ -9,4 +9,6 @@ public interface AirlineFareTypeRepository
         extends JpaRepository<AirlineFareType, Long> {
 
     List<AirlineFareType> findByAirline_Id(Long airlineId);
+
+    boolean existsByAirline_IdAndFareType_Id(Long airlineId, Long fareTypeId);
 }

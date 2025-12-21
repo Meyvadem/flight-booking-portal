@@ -1,5 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
-import logoPng from "../assets/logo.png";
+import AppTopBar from "../components/AppTopBar";
+import { apiJson } from "../api";
+
 
 type TripType = "ONE_WAY" | "ROUND_TRIP";
 
@@ -11,7 +14,6 @@ type Airport = {
   name: string;
 };
 
-// ✅ Senin “başta kullandıklarımıza dön” dediğin: sadece bunlar
 const HERO_IMAGES: string[] = [
   "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=2400&q=80",
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2400&q=80",
@@ -19,7 +21,6 @@ const HERO_IMAGES: string[] = [
   "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2400&q=80",
 ];
 
-// ✅ backend endpoints
 const FROM_ENDPOINT = "/api/airports/from";
 const TO_ENDPOINT = (fromId: number) => `/api/airports/to?fromId=${fromId}`;
 
@@ -33,15 +34,6 @@ const AIRLINE_CHIPS = [
   "Lufthansa",
 ];
 
-function airportRow(a: Airport) {
-  return `${a.code} · ${a.city} (${a.name})`;
-}
-
-/**
- * ✅ AirportPicker FIX:
- * - Seçili code inputta yazsa bile (ör: SAW) dropdown açıldığında tüm seçenekleri gösterir.
- * - Arama yapmak istersen yazmaya devam edebilirsin.
- */
 function AirportPicker({
   label,
   options,
@@ -61,7 +53,6 @@ function AirportPicker({
   const [query, setQuery] = useState("");
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
-  // selected değişince input'ta code göster
   useEffect(() => {
     if (selected) setQuery(selected.code);
     else setQuery("");
@@ -78,16 +69,13 @@ function AirportPicker({
 
   const filtered = useMemo(() => {
     const base = options ?? [];
-
     const qRaw = query.trim();
     const selectedCode = selected?.code ?? "";
 
-    // ✅ input tam seçili code ise ve dropdown açıksa: filtreleme yapma
     const shouldShowAll =
       open && selectedCode && qRaw.toUpperCase() === selectedCode.toUpperCase();
 
     const q = shouldShowAll ? "" : qRaw.toLowerCase();
-
     if (!q) return base.slice(0, 10);
 
     return base
@@ -149,6 +137,7 @@ function AirportPicker({
 }
 
 export default function Home() {
+  const navigate = useNavigate();
   const [tripType, setTripType] = useState<TripType>("ROUND_TRIP");
   const isOneWay = tripType === "ONE_WAY";
 
@@ -162,7 +151,6 @@ export default function Home() {
   const [departDate, setDepartDate] = useState(today);
   const [returnDate, setReturnDate] = useState(today);
 
-  // ✅ Airports
   const [fromOptions, setFromOptions] = useState<Airport[]>([]);
   const [toOptions, setToOptions] = useState<Airport[]>([]);
   const [loadingFrom, setLoadingFrom] = useState(false);
@@ -171,7 +159,6 @@ export default function Home() {
   const [fromSelected, setFromSelected] = useState<Airport | null>(null);
   const [toSelected, setToSelected] = useState<Airport | null>(null);
 
-  // ✅ Slider
   const [heroIdx, setHeroIdx] = useState(0);
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -180,64 +167,58 @@ export default function Home() {
     return () => window.clearInterval(id);
   }, []);
 
-  // 1) FROM listesi yükle
   useEffect(() => {
-    (async () => {
-      setLoadingFrom(true);
-      try {
-        const res = await fetch(FROM_ENDPOINT, {
-          headers: { Accept: "application/json" },
-        });
-        const data = (await res.json()) as Airport[];
-        setFromOptions(data);
+  (async () => {
+    setLoadingFrom(true);
+    try {
+      const data = await apiJson<Airport[]>(FROM_ENDPOINT);
+      setFromOptions(data);
+      if (data.length > 0) setFromSelected(data[0]);
+    } finally {
+      setLoadingFrom(false);
+    }
+  })();
+}, []);
 
-        if (data.length > 0) setFromSelected(data[0]);
-      } finally {
-        setLoadingFrom(false);
-      }
-    })();
-  }, []);
-
-  // 2) FROM değişince TO listesi yükle
   useEffect(() => {
-    if (!fromSelected) return;
+  if (!fromSelected) return;
 
-    (async () => {
-      setLoadingTo(true);
-      try {
-        const res = await fetch(TO_ENDPOINT(fromSelected.id), {
-          headers: { Accept: "application/json" },
-        });
-        const data = (await res.json()) as Airport[];
-        setToOptions(data);
-
-        setToSelected(null);
-      } finally {
-        setLoadingTo(false);
-      }
-    })();
-  }, [fromSelected?.id]);
+  (async () => {
+    setLoadingTo(true);
+    try {
+      const data = await apiJson<Airport[]>(TO_ENDPOINT(fromSelected.id));
+      setToOptions(data);
+      setToSelected(null);
+    } finally {
+      setLoadingTo(false);
+    }
+  })();
+}, [fromSelected?.id])
 
   const canSearch = !!fromSelected && !!toSelected && !loadingTo;
 
   function handleSearch() {
     if (!fromSelected || !toSelected) return;
 
-    console.log("SEARCH PAYLOAD", {
-      tripType,
-      fromId: fromSelected.id,
-      toId: toSelected.id,
-      departDate,
-      returnDate: isOneWay ? null : returnDate,
-    });
+    const params = new URLSearchParams();
+    params.set("from", fromSelected.code);
+    params.set("to", toSelected.code);
+    params.set("departureDate", departDate);
+
+    if (!isOneWay) {
+      params.set("returnDate", returnDate);
+    }
+
+    navigate(`/results?${params.toString()}`);
   }
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* HERO */}
-      <div className="relative h-[860px] w-full overflow-hidden">
-        {/* bg slider */}
-        <div className="absolute inset-0">
+      {/* ✅ dropdown kesilmesin diye: dış container overflow-visible */}
+      <div className="relative h-[860px] w-full overflow-visible">
+        {/* ✅ background sadece burada kesilsin */}
+        <div className="absolute inset-0 overflow-hidden">
           {HERO_IMAGES.map((src, i) => (
             <div
               key={`${src}-${i}`}
@@ -249,42 +230,16 @@ export default function Home() {
           ))}
         </div>
 
-        {/* overlay */}
         <div className="absolute inset-0 bg-black/25" />
 
-        {/* TOP BAR */}
+        {/* ✅ TOP BAR ortak */}
         <div className="fixed top-0 left-0 right-0 z-20">
-          <div className="bg-black/18 backdrop-blur-2xl border-b border-white/10">
-            <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-white/80 p-2 shadow-sm">
-                  <img
-                    src={logoPng}
-                    alt="FlyAway logo"
-                    className="h-10 w-10 object-contain drop-shadow"
-                  />
-                </div>
-                <div className="text-xl font-semibold tracking-wide text-white">
-                  FlyAway
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <button className="rounded-full bg-white/15 px-6 py-3 text-base text-white hover:bg-white/20">
-                  Sign In
-                </button>
-                <button className="rounded-full bg-white px-6 py-3 text-base font-semibold text-slate-900 hover:bg-slate-100">
-                  Register
-                </button>
-              </div>
-            </div>
-          </div>
+          <AppTopBar />
         </div>
 
         {/* SEARCH AREA */}
         <div className="relative z-10 flex h-full items-start justify-center">
           <div className="w-full">
-            {/* ✅ biraz daha aşağı */}
             <div className="mx-auto mt-[330px] max-w-7xl px-6">
               {/* tabs */}
               <div className="mb-6 flex justify-center">
@@ -317,9 +272,7 @@ export default function Home() {
 
               {/* panel */}
               <div className="rounded-[44px] bg-white/10 p-10 shadow-2xl backdrop-blur-3xl">
-                {/* ✅ burada kayma olmasın diye items-end kaldırdım */}
                 <div className="grid grid-cols-12 gap-6 items-stretch">
-                  {/* From */}
                   <div className="col-span-12 md:col-span-3">
                     <AirportPicker
                       label={loadingFrom ? "From (loading...)" : "From"}
@@ -331,7 +284,6 @@ export default function Home() {
                     />
                   </div>
 
-                  {/* To */}
                   <div className="col-span-12 md:col-span-3">
                     <AirportPicker
                       label={loadingTo ? "To (loading...)" : "To"}
@@ -339,17 +291,12 @@ export default function Home() {
                       selected={toSelected}
                       onSelect={(a) => setToSelected(a)}
                       disabled={!fromSelected || loadingTo}
-                      placeholder={
-                        !fromSelected ? "Select From first" : "Select destination"
-                      }
+                      placeholder={!fromSelected ? "Select From first" : "Select destination"}
                     />
                   </div>
 
-                  {/* Depart */}
                   <div className="col-span-12 md:col-span-2">
-                    <label className="mb-2 block text-sm text-white/90">
-                      Depart
-                    </label>
+                    <label className="mb-2 block text-sm text-white/90">Depart</label>
                     <input
                       type="date"
                       value={departDate}
@@ -362,11 +309,8 @@ export default function Home() {
                     />
                   </div>
 
-                  {/* Return */}
                   <div className="col-span-12 md:col-span-2">
-                    <label className="mb-2 block text-sm text-white/90">
-                      Return
-                    </label>
+                    <label className="mb-2 block text-sm text-white/90">Return</label>
                     <input
                       type="date"
                       value={returnDate}
@@ -381,7 +325,6 @@ export default function Home() {
                     />
                   </div>
 
-                  {/* Search */}
                   <div className="col-span-12 md:col-span-2 flex">
                     <button
                       onClick={handleSearch}
@@ -406,7 +349,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* AIRLINES (eski sade) */}
+      {/* AIRLINES */}
       <div className="bg-white">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <div className="flex flex-wrap items-center justify-center gap-3 opacity-90">
@@ -424,12 +367,8 @@ export default function Home() {
 
       {/* Recommended */}
       <div className="mx-auto max-w-7xl px-6 py-14">
-        <h2 className="text-center text-3xl font-semibold">
-          Recommended Destinations
-        </h2>
-        <p className="mt-2 text-center text-slate-500">
-          Later we’ll fetch these dynamically.
-        </p>
+        <h2 className="text-center text-3xl font-semibold">Recommended Destinations</h2>
+        <p className="mt-2 text-center text-slate-500">Later we’ll fetch these dynamically.</p>
 
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-4">
           {["London", "Edinburgh", "Paris", "Coastline"].map((t) => (

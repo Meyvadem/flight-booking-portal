@@ -25,11 +25,11 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
             @Param("end") LocalDateTime end
     );
 
-    // ✅ Uçuşu olan kalkış airport id’leri
+
     @Query("select distinct f.departureAirport.id from Flight f where f.departureAirport is not null")
     List<Long> findDistinctDepartureAirportIds();
 
-    // ✅ Seçilen departure airport id’ye göre gidilebilen arrival airport id’leri
+
     @Query("select distinct f.arrivalAirport.id from Flight f where f.departureAirport.id = :fromId and f.arrivalAirport is not null")
     List<Long> findDistinctArrivalAirportIdsByDeparture(@Param("fromId") Long fromId);
 }

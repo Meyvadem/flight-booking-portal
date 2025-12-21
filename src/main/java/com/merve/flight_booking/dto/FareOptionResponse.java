@@ -6,6 +6,11 @@ public class FareOptionResponse {
     private int includedBaggageKg;
     private double extraPrice;
     private double totalPrice;
+    private Long airlineFareTypeId;
+
+    public Long getAirlineFareTypeId() { return airlineFareTypeId; }
+    public void setAirlineFareTypeId(Long airlineFareTypeId) { this.airlineFareTypeId = airlineFareTypeId; }
+
 
     public String getFareType() {
         return fareType;

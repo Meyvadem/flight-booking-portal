@@ -5,6 +5,9 @@ import com.merve.flight_booking.entity.*;
 import com.merve.flight_booking.repository.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class BookingService {
@@ -98,5 +101,41 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
     }
 
+    @Transactional
+    public void cancelBooking(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        String email = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication().getName();
+
+        if (booking.getUser() == null || booking.getUser().getEmail() == null ||
+                !booking.getUser().getEmail().equals(email)) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN,
+                    "You can only cancel your own booking"
+            );
+        }
+
+        if (booking.getStatus() == BookingStatus.CONFIRMED) {
+            throw new RuntimeException("Confirmed booking cannot be cancelled");
+        }
+
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+    }
+
+    public List<Booking> getMyBookings() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (email == null || email.isBlank()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.UNAUTHORIZED,
+                    "Unauthorized"
+            );
+        }
+
+        return bookingRepository.findByUser_EmailOrderByBookingDateDesc(email);
+    }
 
 }
