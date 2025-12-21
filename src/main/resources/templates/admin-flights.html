@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin · Flights</title>
+    <style>
+        body { margin:0; font-family:system-ui, Arial; background:#0b1220; color:#e5e7eb; }
+        header { padding:16px 22px; display:flex; align-items:center; justify-content:space-between;
+          background:rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.10); }
+        .brand { font-weight:800; letter-spacing:.2px; }
+        .pill { font-size:12px; padding:4px 10px; border-radius:999px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); margin-left:10px; }
+        .wrap { max-width:1200px; margin:0 auto; padding:22px; }
+        .toprow { display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+        .btn { display:inline-block; padding:10px 12px; border-radius:12px; background:#2563eb; color:#fff; text-decoration:none; font-weight:700; border:0; cursor:pointer;}
+        .btn.secondary { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); }
+        .btn.danger { background:#ef4444; }
+        input { padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(0,0,0,.25); color:#e5e7eb; }
+        table { width:100%; border-collapse:separate; border-spacing:0; margin-top:14px; overflow:hidden; border-radius:16px; }
+        th, td { padding:12px 12px; border-bottom:1px solid rgba(255,255,255,.10); }
+        th { text-align:left; font-size:12px; color:#9ca3af; background:rgba(255,255,255,.06); }
+        tr { background:rgba(255,255,255,.04); }
+        tr:hover { background:rgba(255,255,255,.06); }
+        .muted { color:#9ca3af; font-size:13px; }
+        .msg { margin-top:12px; padding:10px 12px; border-radius:14px; background:rgba(16,185,129,.14); border:1px solid rgba(16,185,129,.28); color:#a7f3d0; }
+        .chip { font-size:12px; padding:2px 8px; border-radius:999px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <span class="brand">FlyAway Admin</span>
+        <span class="pill">Thymeleaf SSR</span>
+    </div>
+    <div style="display:flex; gap:10px;">
+        <a class="btn secondary" href="/admin">Dashboard</a>
+        <a class="btn secondary" href="/admin/users">Users</a>
+        <a class="btn secondary" href="/admin/flights">Flights</a>
+        <a class="btn" href="/admin/logout" style="background:#f97316;">Logout</a>
+    </div>
+</header>
+
+<div class="wrap">
+    <div class="toprow">
+        <div>
+            <h2 style="margin:0;">Flights</h2>
+            <div class="muted">List / search / create / delete flights</div>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <form method="get" action="/admin/flights" style="display:flex; gap:10px; align-items:center;">
+                <input name="q" placeholder="Search flight number, airline, airport..." th:value="${q}" />
+                <button class="btn secondary" type="submit">Search</button>
+            </form>
+            <a class="btn" href="/admin/flights/new">+ New flight</a>
+        </div>
+    </div>
+
+    <div th:if="${msg}" class="msg" th:text="${msg}">ok</div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Flight No</th>
+            <th>Airline</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Departure</th>
+            <th>Arrival</th>
+            <th>Base Price</th>
+            <th style="width:120px;">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="f : ${flights}">
+            <td th:text="${f.id}">1</td>
+            <td><span class="chip" th:text="${f.flightNumber}">TK0001</span></td>
+            <td th:text="${f.airline != null ? (f.airline.code + ' · ' + f.airline.name) : '—'}">—</td>
+            <td th:text="${f.departureAirport != null ? (f.departureAirport.code + ' ' + f.departureAirport.city) : '—'}">—</td>
+            <td th:text="${f.arrivalAirport != null ? (f.arrivalAirport.code + ' ' + f.arrivalAirport.city) : '—'}">—</td>
+            <td th:text="${#temporals.format(f.departureTime, 'dd.MM.yyyy HH:mm')}">-</td>
+            <td th:text="${#temporals.format(f.arrivalTime, 'dd.MM.yyyy HH:mm')}">-</td>
+            <td th:text="${f.basePrice}">0</td>
+            <td>
+                <form th:action="@{'/admin/flights/' + ${f.id} + '/delete'}" method="post"
+                      onsubmit="return confirm('Delete this flight?');">
+                    <button class="btn danger" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="muted" style="margin-top:12px;">
+        Delete is blocked if there are bookings for the flight.
+    </div>
+</div>
+
+</body>
+</html>

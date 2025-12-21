@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface FlightRepository extends JpaRepository<Flight, Long> {
 
@@ -32,4 +33,11 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
 
     @Query("select distinct f.arrivalAirport.id from Flight f where f.departureAirport.id = :fromId and f.arrivalAirport is not null")
     List<Long> findDistinctArrivalAirportIdsByDeparture(@Param("fromId") Long fromId);
+
+    Optional<Flight> findByFlightNumber(String flightNumber);
+    boolean existsByFlightNumber(String flightNumber);
+
+
 }
+
+

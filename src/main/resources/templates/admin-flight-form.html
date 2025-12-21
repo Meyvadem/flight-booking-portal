@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin · New Flight</title>
+    <style>
+        body { margin:0; font-family:system-ui, Arial; background:#0b1220; color:#e5e7eb; }
+        header { padding:16px 22px; display:flex; align-items:center; justify-content:space-between;
+          background:rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.10); }
+        .brand { font-weight:800; }
+        .wrap { max-width:900px; margin:0 auto; padding:22px; }
+        .card { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:18px; }
+        .grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
+        label { font-size:12px; color:#9ca3af; display:block; margin-bottom:6px; }
+        input, select { width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(0,0,0,.25); color:#e5e7eb; }
+        .btn { display:inline-block; padding:10px 12px; border-radius:12px; background:#2563eb; color:#fff; text-decoration:none; font-weight:700; border:0; cursor:pointer;}
+        .btn.secondary { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); }
+        .err { margin-top:12px; padding:10px 12px; border-radius:14px; background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.30); color:#fecaca; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">FlyAway Admin</div>
+    <div style="display:flex; gap:10px;">
+        <a class="btn secondary" href="/admin/flights">Back to flights</a>
+        <a class="btn" href="/admin/logout" style="background:#f97316;">Logout</a>
+    </div>
+</header>
+
+<div class="wrap">
+    <h2 style="margin:0 0 10px 0;">Create Flight</h2>
+
+    <div class="card">
+        <form method="post" action="/admin/flights">
+            <div class="grid">
+                <div>
+                    <label>Flight number</label>
+                    <input name="flightNumber" placeholder="PC0007" th:value="${flightNumber}" />
+                </div>
+
+                <div>
+                    <label>Airline</label>
+                    <select name="airlineId" required>
+                        <option value="">Select airline</option>
+                        <option th:each="a : ${airlines}"
+                                th:value="${a.id}"
+                                th:selected="${airlineId} == ${a.id}"
+                                th:text="${a.code + ' · ' + a.name}">
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Departure airport</label>
+                    <select name="departureAirportId" required>
+                        <option value="">Select departure</option>
+                        <option th:each="ap : ${airports}"
+                                th:value="${ap.id}"
+                                th:selected="${departureAirportId} == ${ap.id}"
+                                th:text="${ap.code + ' · ' + ap.city + ' · ' + ap.name}">
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Arrival airport</label>
+                    <select name="arrivalAirportId" required>
+                        <option value="">Select arrival</option>
+                        <option th:each="ap : ${airports}"
+                                th:value="${ap.id}"
+                                th:selected="${arrivalAirportId} == ${ap.id}"
+                                th:text="${ap.code + ' · ' + ap.city + ' · ' + ap.name}">
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Departure time</label>
+                    <input type="datetime-local" name="departureTime" th:value="${departureTime}" required />
+                </div>
+
+                <div>
+                    <label>Arrival time</label>
+                    <input type="datetime-local" name="arrivalTime" th:value="${arrivalTime}" required />
+                </div>
+
+                <div>
+                    <label>Base price</label>
+                    <input type="number" step="0.01" name="basePrice" placeholder="3458" th:value="${basePrice}" required />
+                </div>
+            </div>
+
+            <div th:if="${error}" class="err" th:text="${error}">error</div>
+
+            <div style="margin-top:14px; display:flex; gap:10px;">
+                <a class="btn secondary" href="/admin/flights">Cancel</a>
+                <button class="btn" type="submit">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

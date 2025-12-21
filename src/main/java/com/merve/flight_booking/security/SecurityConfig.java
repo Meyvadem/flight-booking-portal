@@ -45,7 +45,8 @@ public class SecurityConfig {
         return http
                 .securityMatcher("/admin/**")
                 .csrf(csrf -> csrf.disable())
-                .userDetailsService(adminUsers) // ✅ burası kritik: admin login artık DB’ye gitmez
+                .userDetailsService(adminUsers)
+                .anonymous(a -> a.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/login").permitAll()
                         .anyRequest().hasRole("ADMIN")
@@ -64,11 +65,12 @@ public class SecurityConfig {
                 .build();
     }
 
-    // 3) /api/** -> stateless + JWT
+    // 3) /api/** -> stateless + JWT (BURASI JWT, DEĞİŞTİRMİYORUZ)
     @Bean
     @Order(2)
     public SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
         return http
+                .securityMatcher("/api/**") // ✅ KRİTİK: sadece /api
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -77,10 +79,29 @@ public class SecurityConfig {
                                 "/api/meal-options",
                                 "/api/seat-options"
                         ).permitAll()
-                        .requestMatchers("/api/auth/**", "/api/flights/**", "/api/airports/**", "/error").permitAll()
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/flights/**",
+                                "/api/airports/**",
+                                "/error"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+
+    // 4) SPA / React routes (/, /results, /ancillaries, /payment ...) -> permitAll
+    @Bean
+    @Order(3)
+    public SecurityFilterChain spaChain(HttpSecurity http) throws Exception {
+        return http
+                // admin ve api dışındaki her şey buraya düşer
+                .csrf(csrf -> csrf.disable())
+                .anonymous(a -> a.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
+                )
                 .build();
     }
 }

@@ -1,11 +1,11 @@
 // frontend/src/api.ts
 export function authExpiredRedirectHome() {
   localStorage.removeItem("token");
-  localStorage.removeItem("userEmail"); // bunu da temizle
-
-  // replace daha temiz (geri tuşunda expired sayfaya dönmez)
-  window.location.replace("/");
+  localStorage.removeItem("userEmail");
+  window.location.href = "/";
 }
+
+export type ApiError = Error & { status?: number; body?: string };
 
 async function apiFetch(url: string, init?: RequestInit): Promise<Response> {
   const token = localStorage.getItem("token");
@@ -19,10 +19,11 @@ async function apiFetch(url: string, init?: RequestInit): Promise<Response> {
     },
   });
 
-  // ✅ Her sayfada ortak davranış
   if (res.status === 401 || res.status === 403) {
     authExpiredRedirectHome();
-    throw new Error("AUTH_EXPIRED");
+    const err = new Error("AUTH_EXPIRED") as ApiError;
+    err.status = res.status;
+    throw err;
   }
 
   return res;
@@ -33,7 +34,10 @@ export async function apiJson<T>(url: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const t = await res.text().catch(() => "");
-    throw new Error(`${res.status} ${t || res.statusText}`);
+    const err = new Error(t || res.statusText) as ApiError;
+    err.status = res.status;
+    err.body = t;
+    throw err;
   }
 
   return (await res.json()) as T;
@@ -44,6 +48,9 @@ export async function apiVoid(url: string, init?: RequestInit): Promise<void> {
 
   if (!res.ok) {
     const t = await res.text().catch(() => "");
-    throw new Error(`${res.status} ${t || res.statusText}`);
+    const err = new Error(t || res.statusText) as ApiError;
+    err.status = res.status;
+    err.body = t;
+    throw err;
   }
 }

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin - Add User</title>
+    <style>
+        body { font-family: system-ui, Arial; background:#0b1220; color:#e5e7eb; margin:0; }
+        header { padding:18px 24px; background:rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.08); display:flex; justify-content:space-between; align-items:center; }
+        .wrap { max-width:720px; margin:0 auto; padding:24px; }
+        .card { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10); border-radius:16px; padding:16px; }
+        .muted { color:#9ca3af; font-size:13px; }
+        a.btn2 { display:inline-block; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.10); color:white; text-decoration:none; border:1px solid rgba(255,255,255,.12); }
+        button.btn { width:100%; padding:10px 12px; border-radius:12px; background:#2563eb; color:white; border:0; cursor:pointer; font-weight:700; }
+        input { width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.25); color:#e5e7eb; }
+        .row { display:grid; gap:10px; margin-top:10px; }
+        .err { margin-top:12px; padding:12px; border-radius:14px; background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.20); color:#fecaca; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <div style="font-weight:800;">FlyAway Admin</div>
+        <div class="muted">Add new user (Thymeleaf SSR)</div>
+    </div>
+    <div style="display:flex; gap:10px;">
+        <a class="btn2" href="/admin/users">Back to Users</a>
+        <a class="btn2" href="/admin/logout">Logout</a>
+    </div>
+</header>
+
+<div class="wrap">
+    <div class="card">
+        <h2 style="margin:0 0 6px 0;">Create User</h2>
+        <div class="muted">Role will be saved as <b>USER</b>.</div>
+
+        <div th:if="${error}" class="err" th:text="${error}">Error</div>
+
+        <form method="post" action="/admin/users" class="row">
+            <div>
+                <div class="muted" style="margin-bottom:6px;">Name</div>
+                <input name="name" placeholder="Full name" th:value="${name}" />
+            </div>
+
+            <div>
+                <div class="muted" style="margin-bottom:6px;">Email</div>
+                <input name="email" placeholder="email@example.com" th:value="${email}" />
+            </div>
+
+            <div>
+                <div class="muted" style="margin-bottom:6px;">Password</div>
+                <input name="password" type="password" placeholder="Min 6 chars" />
+            </div>
+
+            <button class="btn" type="submit">Create</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

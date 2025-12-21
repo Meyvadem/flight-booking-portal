@@ -3,28 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Login</title>
+  <title>FlyAway Admin Login</title>
   <style>
-    body{font-family:system-ui;background:#0b1220;color:#e5e7eb;margin:0;display:grid;place-items:center;height:100vh}
-    .card{width:360px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:18px}
-    input{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:#e5e7eb}
-    button{width:100%;padding:10px;border:0;border-radius:12px;background:#2563eb;color:#fff;font-weight:600;cursor:pointer}
-    .muted{color:#9ca3af;font-size:13px}
-    .row{display:grid;gap:10px;margin-top:10px}
+    :root{
+      --glass: rgba(255,255,255,.10);
+      --glass2: rgba(255,255,255,.08);
+      --border: rgba(255,255,255,.16);
+      --text: #e5e7eb;
+      --muted: rgba(229,231,235,.75);
+      --bg1: #07101f;
+      --btn: #ff6a00;
+      --btn2:#ff7c1a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 400px at 20% 10%, rgba(59,130,246,.25), transparent),
+        radial-gradient(800px 500px at 80% 30%, rgba(255,106,0,.20), transparent),
+        linear-gradient(180deg, var(--bg1), #050814 65%);
+      display:grid; place-items:center;
+      padding:24px;
+    }
+    .card{
+      width: min(420px, 100%);
+      border-radius: 24px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(18px);
+      padding: 22px;
+      box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: linear-gradient(135deg, rgba(255,255,255,.14), transparent 45%);
+      pointer-events:none;
+    }
+    h1{margin:0; font-size:26px; letter-spacing:.2px}
+    .sub{margin-top:6px; color:var(--muted); font-size:13px}
+    form{margin-top:16px; display:grid; gap:10px}
+    label{font-size:12px; color:var(--muted)}
+    input{
+      width:100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      padding: 12px 12px;
+      outline:none;
+    }
+    input:focus{border-color: rgba(255,255,255,.35)}
+    button{
+      margin-top:4px;
+      width:100%;
+      border:0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight:700;
+      cursor:pointer;
+      color:white;
+      background: linear-gradient(180deg, var(--btn), var(--btn2));
+      box-shadow: 0 14px 30px rgba(255,106,0,.35);
+    }
+    .msg{
+      margin-top:10px;
+      font-size:13px;
+      color:#ffd0b3;
+      background: rgba(255,106,0,.10);
+      border: 1px solid rgba(255,106,0,.25);
+      padding:10px 12px;
+      border-radius: 14px;
+    }
+    .ok{
+      color:#b7f7d0;
+      background: rgba(16,185,129,.12);
+      border-color: rgba(16,185,129,.25);
+    }
+    .hint{
+      margin-top:12px;
+      font-size:12px;
+      color: rgba(229,231,235,.60);
+      line-height:1.4;
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2 style="margin:0 0 6px 0;">Admin Login</h2>
-    <div class="muted">Thymeleaf form login</div>
+<div class="card">
+  <h1>FlyAway Admin</h1>
+  <div class="sub">Thymeleaf (SSR) + Session Login</div>
 
-    <form method="post" action="/admin/login" class="row">
-      <input name="username" placeholder="Kullanıcı adı" />
-      <input name="password" type="password" placeholder="Şifre" />
-      <button type="submit">Giriş Yap</button>
-      <div class="muted" th:if="${param.error}">Hatalı kullanıcı adı/şifre</div>
-      <div class="muted" th:if="${param.logout}">Çıkış yapıldı</div>
-    </form>
-  </div>
+  <form method="post" action="/admin/login">
+    <div>
+      <label>Kullanıcı adı</label>
+      <input name="username" placeholder="admin" autocomplete="username" />
+    </div>
+    <div>
+      <label>Şifre</label>
+      <input name="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+
+    <button type="submit">Giriş Yap</button>
+
+    <div class="msg" th:if="${param.error}">Hatalı kullanıcı adı / şifre</div>
+    <div class="msg ok" th:if="${param.logout}">Çıkış yapıldı</div>
+
+    <div class="hint">
+      Bu admin paneli React’ten bağımsızdır.<br/>
+      Admin güvenliği JWT değil, <b>Session (JSESSIONID)</b> ile sağlanır.
+    </div>
+  </form>
+</div>
 </body>
 </html>

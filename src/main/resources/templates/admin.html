@@ -3,49 +3,132 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Panel</title>
+  <title>FlyAway Admin</title>
   <style>
-    body { font-family: system-ui, Arial; background:#0b1220; color:#e5e7eb; margin:0; }
-    header { padding:18px 24px; background:rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.08); display:flex; justify-content:space-between; align-items:center; }
-    .wrap { max-width:1100px; margin:0 auto; padding:24px; }
-    .grid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px; }
-    .card { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10); border-radius:16px; padding:16px; }
-    .muted { color:#9ca3af; font-size:13px; }
-    a.btn { display:inline-block; padding:10px 12px; border-radius:12px; background:#2563eb; color:white; text-decoration:none; }
-    code { background:rgba(0,0,0,.35); padding:2px 6px; border-radius:8px; }
+    :root{
+      --glass: rgba(255,255,255,.10);
+      --border: rgba(255,255,255,.16);
+      --text: #e5e7eb;
+      --muted: rgba(229,231,235,.70);
+      --bg1:#07101f;
+      --accent:#ff6a00;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 420px at 18% 12%, rgba(59,130,246,.22), transparent),
+        radial-gradient(800px 520px at 78% 26%, rgba(255,106,0,.18), transparent),
+        linear-gradient(180deg, var(--bg1), #050814 65%);
+    }
+    .top{
+      position:sticky; top:0;
+      backdrop-filter: blur(18px);
+      background: rgba(0,0,0,.22);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      padding: 16px 22px;
+      display:flex; align-items:center; justify-content:space-between;
+      z-index:10;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .pill{
+      font-size:11px;
+      padding:6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      color: rgba(229,231,235,.85);
+    }
+    .btn{
+      text-decoration:none;
+      color:white;
+      font-weight:700;
+      padding:10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.14);
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn:hover{ background: rgba(255,255,255,.14); }
+    .btn-accent{
+      background: linear-gradient(180deg, var(--accent), #ff7c1a);
+      border: 0;
+      box-shadow: 0 14px 30px rgba(255,106,0,.30);
+    }
+    .btn-accent:hover{ filter: brightness(1.02); }
+
+    .wrap{max-width:1100px; margin:0 auto; padding:24px}
+    .hero{
+      border-radius: 26px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+      padding: 18px;
+      box-shadow: 0 26px 80px rgba(0,0,0,.45);
+    }
+    .title{font-size:26px; font-weight:900; margin:0}
+    .sub{margin-top:6px; color:var(--muted); font-size:13px}
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:12px;
+    }
+    .card{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      padding: 14px;
+    }
+    .k{font-size:12px; color:var(--muted)}
+    .v{margin-top:6px; font-weight:900}
+    .actions{
+      margin-top:12px;
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
-<header>
-  <div>
-    <div style="font-weight:700;">FlyAway Admin</div>
-    <div class="muted">Thymeleaf ile server-side sayfa</div>
+<div class="top">
+  <div class="brand">
+    <div>FlyAway Admin</div>
+    <span class="pill">Thymeleaf SSR</span>
   </div>
 
-  <div style="display:flex; gap:10px;">
-    <a class="btn" href="/">Home</a>
-    <a class="btn" href="/admin/logout">Logout</a>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+    <a class="btn" href="/admin">Dashboard</a>
+    <a class="btn btn-accent" href="/admin/logout">Logout</a>
   </div>
-</header>
+</div>
 
 <div class="wrap">
-  <h2>Özet</h2>
-  <p class="muted">Bu sayfa React’ten bağımsızdır. Spring Boot render eder.</p>
+  <div class="hero">
+    <h1 class="title">Dashboard</h1>
+    <div class="sub">Admin paneli server-side render edilir. User tarafı React’tir.</div>
 
-  <div class="grid">
-    <div class="card">
-      <div style="font-weight:700;">Server Time</div>
-      <div class="muted" th:text="${serverTime}">-</div>
-    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="k">App</div>
+        <div class="v" th:text="${appName}">FlyAway</div>
+      </div>
 
-    <div class="card">
-      <div style="font-weight:700;">Profile</div>
-      <div class="muted" th:text="${profile}">default</div>
-    </div>
-
-    <div class="card">
-      <div style="font-weight:700;">API</div>
-      <div class="muted">Örn: <code>/api/health</code></div>
+      <div class="card">
+        <div class="k">Quick actions</div>
+        <div class="actions">
+          <a class="btn" href="/admin/users">Manage users</a>
+          <a class="btn" href="/admin/flights">Manage flights</a>
+        </div>
+        <div class="k" style="margin-top:10px">Listele / ekle / sil / düzenle</div>
+      </div>
     </div>
   </div>
 </div>

@@ -20,6 +20,9 @@ public class AdminPageController {
     public String admin(Model model) {
         model.addAttribute("serverTime", ZonedDateTime.now().toString());
 
+        String appName = env.getProperty("spring.application.name", "FlyAway");
+        model.addAttribute("appName", appName);
+
         String[] profiles = env.getActiveProfiles();
         model.addAttribute("profile", profiles.length > 0 ? String.join(",", profiles) : "default");
 
