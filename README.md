@@ -96,35 +96,49 @@ This project was developed as part of a Web Design and Programming course to gai
 
 ---
 
+
 ## Screenshots
 
 ### Home Page
-![Home Page](Screenshotss/Home3.png)
 
-![Login Page](Screenshotss/Home11.png)
+(Screenshotss/Home22.png)
 
-![Login Page](Screenshotss/Home22.png)
 
-![Login Page](Screenshotss/Home33.png)
+(Screenshotss/Home33.png)
 
-![Login Page](Screenshotss/Home34.png)
 
-![Login Page](Screenshotss/Home35.png)
+(Screenshotss/Home34.png)
+
+
+(Screenshotss/Home35.png)
+
+
 
 ### Flight Selection Page
-![Login Page](Screenshotss/Selection1_2.png)
 
-![Login Page](Screenshotss/Selection2_2.png)
+(Screenshotss/Selection1_2.png)
 
-### Ancillaries Flow
-![Booking](Screenshotss/Ancl_1.png)
 
-![Booking](Screenshotss/Ancl_2.png)
+(Screenshotss/Selection2_2.png)
 
-![Booking](Screenshotss/Ancl_3.png)
 
-![Booking](Screenshotss/Ancl_4.png)
 
-### Payment Flow
-![Booking](Screenshotss/Payment.png)
+### Ancillaries Page
+
+(Screenshotss/Ancl_1.png)
+
+
+(Screenshotss/Ancl_2.png)
+
+
+(Screenshotss/Ancl_3.png)
+
+
+(Screenshotss/Ancl_4.png)
+
+
+
+### Payment Page
+
+(Screenshotss/Payment.png)
 
