@@ -1,7 +1,7 @@
 // frontend/src/components/AppTopBar.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logoPng from "../assets/logo.png";
+import logoPng from "../assets/logo4.png";
 
 function decodeJwtPayload(token: string): any | null {
   try {
@@ -26,7 +26,6 @@ function getDisplayNameFromToken(token: string | null) {
   const p = decodeJwtPayload(token);
   if (!p) return "Account";
 
-  // en sık görülen alan isimleri
   const fullName =
     p.fullName ||
     p.name ||
@@ -66,15 +65,17 @@ export default function AppTopBar() {
     <div className="sticky top-0 z-30 border-b border-white/10 bg-black/20 backdrop-blur-2xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-3"
-          type="button"
-        >
-          <div className="rounded-2xl bg-white/80 p-2 shadow-sm">
-            <img src={logoPng} alt="FlyAway logo" className="h-9 w-9 object-contain" />
-          </div>
-          <div className="text-lg font-semibold tracking-wide text-white">FlyAway</div>
-        </button>
+  onClick={() => navigate("/")}
+  className="flex items-center gap-3"
+  type="button"
+>
+  <img
+  src={logoPng}
+  alt="FlyAway logo"
+  className="h-12 w-12 object-contain"
+/>
+  <div className="text-lg font-semibold tracking-wide text-white">FlyAway</div>
+</button>
 
         {!token ? (
           <div className="flex items-center gap-3">

@@ -20,7 +20,6 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [sp] = useSearchParams();
 
-  // login sayfanla aynı mantık: kayıt sonrası redirect
   const redirect = sp.get("redirect") ?? "/";
 
   const [name, setName] = useState("");
@@ -31,10 +30,9 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
-  // --- UI validations
   const nameOk = useMemo(() => isValidName(name), [name]);
   const emailOk = useMemo(() => isValidEmail(email), [email]);
-  const pwOk = useMemo(() => pw.trim().length >= 6, [pw]); // istersen 8 yap
+  const pwOk = useMemo(() => pw.trim().length >= 6, [pw]);
   const pwMatch = useMemo(() => pw.length > 0 && pw === pw2, [pw, pw2]);
 
   const formOk = nameOk && emailOk && pwOk && pwMatch;
@@ -43,25 +41,37 @@ export default function RegisterPage() {
     e.preventDefault();
     setErr("");
 
-    // Frontend format hataları (açıklayıcı)
-    if (!nameOk) {
-      setErr("Name must be at least 2 characters.");
-      return;
-    }
-    if (!emailOk) {
-      setErr("Invalid email format.");
-      return;
-    }
-    if (!pwOk) {
-      setErr("Password must be at least 6 characters.");
-      return;
-    }
-    if (!pwMatch) {
-      setErr("Passwords do not match.");
-      return;
-    }
+    if (!nameOk) return setErr("Name must be at least 2 characters.");
+    if (!emailOk) return setErr("Invalid email format.");
+    if (!pwOk) return setErr("Password must be at least 6 characters.");
+    if (!pwMatch) return setErr("Passwords do not match.");
 
-   
+    setLoading(true);
+    try {
+      // ✅ Backend endpoint'in /api/auth/register ise bunu kullan
+      // Eğer sende /api/auth/signup gibi farklıysa burayı değiştir.
+      const data = await apiJson<RegisterResponse>("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          password: pw,
+        }),
+      });
+
+      // token geldiyse kaydet + yönlendir
+      if (data?.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userEmail", email.trim());
+      }
+
+      navigate(redirect, { replace: true });
+    } catch (e: any) {
+      setErr(e?.message ?? "Register failed.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -83,9 +93,7 @@ export default function RegisterPage() {
             <div className="mt-1 text-sm text-slate-500">Create your FlyAway account.</div>
 
             {!!err && (
-              <div className="mt-6 rounded-2xl bg-red-50 p-4 text-sm text-red-700">
-                {err}
-              </div>
+              <div className="mt-6 rounded-2xl bg-red-50 p-4 text-sm text-red-700">{err}</div>
             )}
 
             <form onSubmit={handleRegister} className="mt-7 space-y-4">
@@ -114,9 +122,7 @@ export default function RegisterPage() {
                   placeholder="Email"
                   autoComplete="email"
                 />
-                {!emailOk && email.length > 0 && (
-                  <div className="mt-1 text-xs text-red-600">Invalid email format.</div>
-                )}
+                {!emailOk && email.length > 0 && <div className="mt-1 text-xs text-red-600">Invalid email format.</div>}
               </div>
 
               <div>

@@ -26,7 +26,7 @@ public class FlightController {
             @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate departureDate,
-            @RequestParam(required = false)  // “URL’de returnDate olmasa da olur” anlamına gelir.
+            @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate returnDate
     ) {

@@ -15,7 +15,6 @@ public class BaggageOption {
 
     // getters & setters
 
-
     public Long getId() {
         return id;
     }

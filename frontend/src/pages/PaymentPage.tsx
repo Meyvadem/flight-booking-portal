@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import AppTopBar from "../components/AppTopBar";
 import { apiJson } from "../api";
 
-/* ------- Types (Ancillaries'ten kopyalayabilirsin) ------- */
 type PlaceLike =
   | string
   | { id?: number; name?: string; code?: string; city?: string; country?: string }
@@ -136,9 +135,8 @@ function isExpired(mm: string, yyyy: string) {
   const y = Number(yyyy);
   if (!m || !y) return true;
 
-  // Kart ay sonunda biter. "Geçerli mi?" kontrolü için bir sonraki ayın 1'i boundary.
-  // Date ayı 0-based bekler: boundary için "next month" kullanıyoruz.
-  const boundary = new Date(y, m, 1); // m=02 -> Date(y,2,1) = March 1
+
+  const boundary = new Date(y, m, 1);
   const now = new Date();
   return boundary <= now;
 }
@@ -169,7 +167,7 @@ export default function PaymentPage() {
   const [err, setErr] = useState("");
   const [payments, setPayments] = useState<PaymentResponse[]>([]);
 
-  // ✅ card form state
+  // card form state
   const [holderName, setHolderName] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [expMonth, setExpMonth] = useState("");
@@ -180,7 +178,7 @@ export default function PaymentPage() {
     return bookingIds.reduce((sum, id) => sum + (bookings[id]?.totalPrice ?? 0), 0);
   }, [bookingIds, bookings]);
 
-  // ✅ Eğer kullanıcı success ekranında refresh yaptıysa: tekrar Payment sayfasında kalmasın, direkt Home'a gitsin.
+
   useEffect(() => {
     const lock = sessionStorage.getItem(SUCCESS_LOCK_KEY);
     if (lock === "1") {
@@ -215,7 +213,7 @@ export default function PaymentPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingIds.join(",")]);
 
-  // ✅ each booking must have seat+meal+baggage selected
+  // each booking must have seat+meal+baggage selected
   const selectionsOk = useMemo(() => {
     if (bookingIds.length === 0) return false;
     return bookingIds.every((id) => {
@@ -235,7 +233,7 @@ export default function PaymentPage() {
     return bookingIds.every((id) => bookings[id]?.status === "CONFIRMED");
   }, [bookingIds, bookings]);
 
-  // ✅ form validation
+  // form validation
   const nameOk = useMemo(() => isValidName(holderName), [holderName]);
   const cardOk = useMemo(() => isValidCardNumber(cardNumber), [cardNumber]);
   const cvcOk = useMemo(() => isValidCvc(cvc), [cvc]);
@@ -286,7 +284,7 @@ export default function PaymentPage() {
     }
   }
 
-  // ✅ Success modal açıkken:
+  // Success modal açıkken:
   // - back tuşu -> direkt home
   // - refresh olursa bir sonraki açılışta home'a atmak için lock bırak
   useEffect(() => {
@@ -324,7 +322,7 @@ export default function PaymentPage() {
     return Array.from({ length: 11 }, (_, i) => String(now + i));
   }, []);
 
-  // ✅ modal açıkken her şeyi kilitle
+  // modal açıkken her şeyi kilitle
   const modalOpen = payments.length > 0;
 
   const payDisabled =
@@ -570,7 +568,7 @@ export default function PaymentPage() {
           </div>
         </div>
 
-        {/* ✅ SUCCESS MODAL (Go Home zorunlu) */}
+        {/* SUCCESS MODAL (Go Home zorunlu) */}
         {payments.length > 0 && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black/55 backdrop-blur-[2px]" />

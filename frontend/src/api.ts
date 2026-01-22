@@ -1,4 +1,5 @@
 // frontend/src/api.ts
+
 export function authExpiredRedirectHome() {
   localStorage.removeItem("token");
   localStorage.removeItem("userEmail");
@@ -7,10 +8,21 @@ export function authExpiredRedirectHome() {
 
 export type ApiError = Error & { status?: number; body?: string };
 
+// ✅ A+B uyumlu base URL
+// - AWS/Render gibi A modelinde: VITE_API_BASE_URL="http(s)://<backend-host>:8080"
+// - B modelinde (tek domain): boş bırak -> "/api/..." aynı origin'de çalışır
+const API_BASE =
+  (import.meta as any).env?.VITE_API_BASE_URL?.toString().replace(/\/$/, "") ?? "";
+
+function withBase(url: string) {
+  if (!API_BASE) return url;
+  return url.startsWith("/") ? `${API_BASE}${url}` : `${API_BASE}/${url}`;
+}
+
 async function apiFetch(url: string, init?: RequestInit): Promise<Response> {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(url, {
+  const res = await fetch(withBase(url), {
     ...init,
     headers: {
       Accept: "application/json",

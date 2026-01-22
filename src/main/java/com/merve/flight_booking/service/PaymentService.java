@@ -46,7 +46,7 @@ public class PaymentService {
         bookingRepository.save(booking);
         paymentRepository.save(payment);
 
-        // 🎯 DTO map
+        // DTO map
         PaymentResponseDTO dto = new PaymentResponseDTO();
         dto.setPaymentId(payment.getId());
         dto.setAmount(payment.getAmount());

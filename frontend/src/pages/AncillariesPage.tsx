@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AppTopBar from "../components/AppTopBar";
 import { apiJson, apiVoid } from "../api";
@@ -19,7 +19,7 @@ type PlaceLike =
   | null
   | undefined;
 
-/** Backend flight bazen farklı shape döndürüyor (from/to veya departureAirport/arrivalAirport) */
+
 type FlightLike = {
   id?: number;
   flightId?: number;
@@ -29,7 +29,6 @@ type FlightLike = {
   airlineName?: string;
   airline?: { code?: string; name?: string };
 
-  // our old DTO
   from?: PlaceLike;
   to?: PlaceLike;
 
@@ -93,7 +92,6 @@ type BookingResponse = {
 
 type StepKey = "seat" | "meal" | "baggage";
 
-// ✅ NEW BG (you can swap easily)
 const BG = "https://plus.unsplash.com/premium_photo-1719943510748-4b4354fbcf56?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
 
@@ -171,28 +169,6 @@ export default function AncillariesPage() {
   const navigate = useNavigate();
 
 
-  const promptingRef = useRef(false);
-const allowNavRef = useRef(false);
-const cancelingRef = useRef(false);
-
-function getResultsUrl() {
-  return sessionStorage.getItem("lastResultsUrl") || "/results";
-}
-
-async function cancelAll() {
-  if (cancelingRef.current) return;
-  cancelingRef.current = true;
-  try {
-    await Promise.all(
-      bookingIds.map((id) =>
-        apiVoid(`/api/bookings/${id}/cancel`, { method: "PUT" }).catch(() => {})
-      )
-    );
-  } finally {
-    cancelingRef.current = false;
-  }
-}
-
   const outBookingId = sp.get("outBookingId");
   const retBookingId = sp.get("retBookingId");
   const bookingId = sp.get("bookingId");
@@ -215,18 +191,18 @@ async function cancelAll() {
     }
   }, [navigate, sp]);
 
-  // ✅ Block browser back/forward with confirm (SPA safe)
+  // Block browser back/forward with confirm
  useEffect(() => {
   if (bookingIds.length === 0) return;
 
   const marker = { anc: true };
   let leaving = false;
 
-  // Sayfayı "kilitle": back basınca popstate tetiklensin ama biz aynı URL'de kalalım
+
   window.history.pushState(marker, "", window.location.href);
 
   const onPopState = async () => {
-    // Kullanıcı URL’den çıkmasın diye hemen aynı sayfayı geri it
+
     window.history.pushState(marker, "", window.location.href);
 
     if (leaving) return;
@@ -236,7 +212,6 @@ async function cancelAll() {
     );
 
     if (!ok) {
-      // Hayır -> hiçbir şey yapma. Bir sonraki back'te yine soracak.
       return;
     }
 
@@ -249,10 +224,8 @@ async function cancelAll() {
       )
     );
 
-    // Artık dinlemeye gerek yok
     window.removeEventListener("popstate", onPopState);
 
-    // ✅ asla history.back() yapma → Google’a atabilir
     const returnUrl = sessionStorage.getItem("anc:returnUrl") || "/";
     navigate(returnUrl, { replace: true });
   };

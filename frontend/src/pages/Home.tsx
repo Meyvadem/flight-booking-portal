@@ -215,9 +215,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* HERO */}
-      {/* ✅ dropdown kesilmesin diye: dış container overflow-visible */}
+      {/* dropdown kesilmesin diye: dış container overflow-visible */}
       <div className="relative h-[860px] w-full overflow-visible">
-        {/* ✅ background sadece burada kesilsin */}
+        {/* background sadece burada kesilsin */}
         <div className="absolute inset-0 overflow-hidden">
           {HERO_IMAGES.map((src, i) => (
             <div
@@ -232,7 +232,7 @@ export default function Home() {
 
         <div className="absolute inset-0 bg-black/25" />
 
-        {/* ✅ TOP BAR ortak */}
+        {/* TOP BAR ortak */}
         <div className="fixed top-0 left-0 right-0 z-20">
           <AppTopBar />
         </div>

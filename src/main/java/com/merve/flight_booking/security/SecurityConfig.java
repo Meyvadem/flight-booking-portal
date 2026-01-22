@@ -1,5 +1,7 @@
 package com.merve.flight_booking.security;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,10 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 @Configuration
 public class SecurityConfig {
 
@@ -23,18 +29,76 @@ public class SecurityConfig {
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
-    // 1) Admin için DB'den bağımsız in-memory kullanıcı
+    // AWS EC2 üzerinde export ADMIN_PASSWORD="..."
+    private String env(String key, String def) {
+        String v = System.getenv(key);
+        return (v == null || v.isBlank()) ? def : v;
+    }
+
+
     @Bean("adminUsers")
     public UserDetailsService adminUsers(PasswordEncoder encoder) {
+        String adminUser = env("ADMIN_USERNAME", "admin");
+        String adminPass = env("ADMIN_PASSWORD", "ChangeMeAdminPassword!");
+
         return new InMemoryUserDetailsManager(
-                User.withUsername("admin")
-                        .password(encoder.encode("Admin@2025!FlyAway"))
+                User.withUsername(adminUser)
+                        .password(encoder.encode(adminPass))
                         .roles("ADMIN")
                         .build()
         );
     }
 
-    // 2) /admin/** -> session + form login (JWT yok)
+    // CORS config
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        // Örn: export FRONTEND_ORIGIN="http://ec2-54-226-202-155.compute-1.amazonaws.com:3000"
+        String feOrigin = env("FRONTEND_ORIGIN", "").trim();
+
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // Local + (varsa) prod origin
+        if (feOrigin.isBlank()) {
+            configuration.setAllowedOrigins(Arrays.asList(
+                    "http://localhost:3000",
+                    "http://localhost:5173"
+            ));
+        } else {
+            configuration.setAllowedOrigins(Arrays.asList(
+                    "http://localhost:3000",
+                    "http://localhost:5173",
+                    feOrigin
+            ));
+        }
+
+        configuration.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ));
+
+        // '*' + credentials bazen sorun çıkarabiliyor; en güvenlisi header listesini açık vermek
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With"
+        ));
+
+        // İstersen response header’larını da expose edebilirsin
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization"
+        ));
+
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+
+    // /admin/** -> session + form login
     @Bean
     @Order(1)
     public SecurityFilterChain adminChain(
@@ -46,7 +110,6 @@ public class SecurityConfig {
                 .securityMatcher("/admin/**")
                 .csrf(csrf -> csrf.disable())
                 .userDetailsService(adminUsers)
-                .anonymous(a -> a.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/login").permitAll()
                         .anyRequest().hasRole("ADMIN")
@@ -65,12 +128,13 @@ public class SecurityConfig {
                 .build();
     }
 
-    // 3) /api/** -> stateless + JWT (BURASI JWT, DEĞİŞTİRMİYORUZ)
+    // /api/** -> stateless + JWT
     @Bean
     @Order(2)
     public SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
         return http
-                .securityMatcher("/api/**") // ✅ KRİTİK: sadece /api
+                .securityMatcher("/api/**")
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ EKLENDI
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -91,17 +155,13 @@ public class SecurityConfig {
                 .build();
     }
 
-    // 4) SPA / React routes (/, /results, /ancillaries, /payment ...) -> permitAll
+    // SPA / React routes -> permitAll
     @Bean
     @Order(3)
     public SecurityFilterChain spaChain(HttpSecurity http) throws Exception {
         return http
-                // admin ve api dışındaki her şey buraya düşer
                 .csrf(csrf -> csrf.disable())
-                .anonymous(a -> a.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-                )
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }
 }

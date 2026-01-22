@@ -36,7 +36,6 @@ public class FareTypeService {
                 airlineFareTypeRepository.findByAirline_Id(airlineId);
 
         return fareTypes.stream()
-                // (isteğe bağlı) LIGHT/ECO/PLUS sırasıyla gelsin diye ufak sort
                 .sorted(Comparator.comparing(af -> af.getFareType().getName()))
                 .map(af -> {
                     FareOptionResponse dto = new FareOptionResponse();

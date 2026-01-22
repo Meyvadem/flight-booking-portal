@@ -90,7 +90,7 @@ useEffect(() => {
   const returnDate = sp.get("returnDate") ?? "";
   const isRoundTrip = !!returnDate;
 
-  // ✅ persist key (aynı arama için)
+  // persist key (aynı arama için)
   const storageKey = useMemo(() => {
     return `resultsState:${from}:${to}:${departureDate}:${returnDate || "ONE_WAY"}`;
   }, [from, to, departureDate, returnDate]);
@@ -109,7 +109,7 @@ useEffect(() => {
 
   const [sortKey, setSortKey] = useState<"price" | "time">("price");
 
-  // ✅ ensure fare options (return options)
+  // ensure fare options (return options)
   async function ensureFareOptions(
   flightId: number,
   force = false
@@ -129,7 +129,7 @@ useEffect(() => {
   }
 }
 
-  // ✅ seçim değişince kaydet (daha sağlam: fareId sakla)
+  // seçim değişince kaydet (daha sağlam: fareId sakla)
   useEffect(() => {
     if (!from || !to || !departureDate) return;
 
@@ -152,7 +152,7 @@ useEffect(() => {
     }
   }, [storageKey, from, to, departureDate, selectedOutboundId, selectedReturnId, chosenFare]);
 
-  // ✅ search
+  // search
   useEffect(() => {
     if (!from || !to || !departureDate) {
       setErr("Missing search params.");
@@ -175,7 +175,7 @@ const json = await apiJson<RoundTripFlightResponse>(
 
 setData(json);
 
-        // ✅ RESTORE (data geldikten sonra)
+        // RESTORE (data geldikten sonra)
         const raw = sessionStorage.getItem(storageKey);
         if (!raw) {
           setSelectedOutboundId(null);
@@ -316,7 +316,7 @@ setData(json);
 
     const token = localStorage.getItem("token");
 
-    // ✅ token yoksa login'e (redirect + pendingContinue)
+    // token yoksa login'e (redirect + pendingContinue)
     if (!token) {
       sessionStorage.setItem(PENDING_CONTINUE_KEY, storageKey);
 
@@ -381,13 +381,13 @@ setData(json);
       }}
     >
       <div className="min-h-screen bg-black/35">
-        {/* ✅ TOP BAR */}
+        {/* TOP BAR */}
         <AppTopBar />
 
         {/* HEADER BLOCK */}
         <div className="mx-auto max-w-7xl px-6 pt-10">
           <div className="rounded-[28px] border border-white/10 bg-white/10 p-7 backdrop-blur-2xl">
-            {/* ✅ Back + Sort şeffaf alanın içinde */}
+            {/* Back + Sort şeffaf alanın içinde */}
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <div className="text-xs font-semibold tracking-widest text-white/70">

@@ -12,4 +12,11 @@ export default defineConfig({
       },
     },
   },
+
+  // npm run preview için gerekli ayarlar
+  preview: {
+    host: true,          // dışarıdan erişim (0.0.0.0)
+    port: 3000,
+    allowedHosts: true,  // ec2-...amazonaws.com hostunu engellemesin
+  },
 });

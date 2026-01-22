@@ -26,12 +26,11 @@ public class AirportService {
                 .toList();
     }
 
-    // ✅ Autocomplete için opsiyonel (query ile)
+    // Autocomplete için opsiyonel (query ile)
     public List<AirportDto> search(String q) {
         String query = (q == null) ? "" : q.trim();
         if (query.isEmpty()) {
             // boşsa ilk 50 dönmek yerine hepsini dönmek ağır olabilir.
-            // küçük tabloda sorun yok. büyükse findTop.. veya paging yaparız.
             return listAll();
         }
         return airportRepository
@@ -51,13 +50,13 @@ public class AirportService {
         );
     }
 
-    // ✅ From listesi: sadece kalkışı olanlar
+    // From listesi: sadece kalkışı olanlar
     public List<AirportDto> listFromAirports() {
         List<Long> ids = flightRepository.findDistinctDepartureAirportIds();
         return airportRepository.findByIdIn(ids).stream().map(this::toDto).toList();
     }
 
-    // ✅ To listesi: fromId’ye göre gidilebilenler
+    // To listesi: fromId’ye göre gidilebilenler
     public List<AirportDto> listToAirports(Long fromId) {
         List<Long> toIds = flightRepository.findDistinctArrivalAirportIdsByDeparture(fromId);
         return airportRepository.findByIdIn(toIds).stream().map(this::toDto).toList();

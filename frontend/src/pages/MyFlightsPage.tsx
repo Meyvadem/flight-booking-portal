@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import AppTopBar from "../components/AppTopBar";
 import { apiJson, apiVoid } from "../api";
 
-/* ---- types (Ancillaries/Payment ile uyumlu) ---- */
 type PlaceLike =
   | string
   | { code?: string; city?: string; name?: string }
@@ -106,7 +105,7 @@ export default function MyFlightsPage() {
     setLoading(true);
     setErr("");
     try {
-      // 1) /api/bookings/my (varsa)
+      // /api/bookings/my
       try {
         const mine = await apiJson<BookingResponse[]>("/api/bookings/my");
         setItems(mine ?? []);
@@ -117,7 +116,7 @@ export default function MyFlightsPage() {
         if (!msg.startsWith("404")) throw e;
       }
 
-      // 2) /api/bookings (bazı projelerde bu kullanıcıya göre filtrelenmiş döner)
+      // /api/bookings
       const all = await apiJson<BookingResponse[]>("/api/bookings");
       setItems(all ?? []);
     } catch (e: any) {

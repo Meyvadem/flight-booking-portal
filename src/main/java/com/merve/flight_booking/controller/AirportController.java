@@ -17,7 +17,7 @@ public class AirportController {
         this.airportService = airportService;
     }
 
-    // ✅ Hepsini listele
+    // Hepsini listele
     @GetMapping
     public List<AirportDto> list(@RequestParam(value = "q", required = false) String q) {
         // q verilirse search, verilmezse listAll
@@ -25,13 +25,13 @@ public class AirportController {
         return airportService.search(q);
     }
 
-    // ✅ From: kalkışı olan havalimanları
+    // From: kalkışı olan havalimanları
     @GetMapping("/from")
     public List<AirportDto> fromAirports() {
         return airportService.listFromAirports();
     }
 
-    // ✅ To: seçilen fromId’ye göre gidilebilen havalimanları
+    // To: seçilen fromId’ye göre gidilebilen havalimanları
     @GetMapping("/to")
     public List<AirportDto> toAirports(@RequestParam Long fromId) {
         return airportService.listToAirports(fromId);

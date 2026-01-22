@@ -26,7 +26,7 @@ public class AdminUserController {
         this.bookingRepository = bookingRepository;
     }
 
-    // ✅ LIST
+    // LIST
     @GetMapping
     public String list(Model model,
                        @RequestParam(name = "q", required = false) String q) {
@@ -50,7 +50,7 @@ public class AdminUserController {
         return "admin-users"; // templates/admin-users.html
     }
 
-    // ✅ CREATE FORM
+    // CREATE FORM
     @GetMapping("/new")
     public String newUserForm(Model model) {
         model.addAttribute("name", "");
@@ -59,7 +59,7 @@ public class AdminUserController {
         return "admin-user-form"; // templates/admin-user-form.html
     }
 
-    // ✅ CREATE
+    // CREATE
     @PostMapping
     public String createUser(@RequestParam String name,
                              @RequestParam String email,
@@ -108,7 +108,6 @@ public class AdminUserController {
         u.setEmail(em);
         u.setPassword(passwordEncoder.encode(pw));
 
-        // ✅ rol default USER (senin enum ismin: Role.USER gibi)
         u.setRole(com.merve.flight_booking.entity.Role.USER);
 
         userRepository.save(u);
@@ -117,7 +116,7 @@ public class AdminUserController {
         return "redirect:/admin/users";
     }
 
-    // ✅ DELETE
+    // DELETE
     @PostMapping("/{id}/delete")
     public String deleteUser(@PathVariable Long id, RedirectAttributes ra) {
         if (id == null) return "redirect:/admin/users";

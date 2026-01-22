@@ -42,7 +42,7 @@ public class AdminFlightController {
         this.bookingRepository = bookingRepository;
     }
 
-    // ✅ LIST + SEARCH
+
     @GetMapping
     public String list(Model model, @RequestParam(name = "q", required = false) String q) {
         var all = flightRepository.findAll();
@@ -71,7 +71,7 @@ public class AdminFlightController {
         return s != null && s.toLowerCase(Locale.ROOT).contains(q);
     }
 
-    // ✅ CREATE FORM
+
     @GetMapping("/new")
     public String newForm(Model model) {
         model.addAttribute("flightNumber", "");
@@ -87,7 +87,7 @@ public class AdminFlightController {
         return "admin-flight-form"; // templates/admin-flight-form.html
     }
 
-    // ✅ CREATE
+
     @PostMapping
     public String create(
             @RequestParam String flightNumber,
@@ -171,7 +171,7 @@ public class AdminFlightController {
         return "admin-flight-form";
     }
 
-    // ✅ DELETE (FK CHECK)
+
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id, RedirectAttributes ra) {
         if (id == null) return "redirect:/admin/flights";
@@ -181,7 +181,6 @@ public class AdminFlightController {
             return "redirect:/admin/flights";
         }
 
-        // FK guard: booking varsa silme
         if (bookingRepository.existsByFlight_Id(id)) {
             ra.addFlashAttribute("msg", "Cannot delete: there are bookings for this flight.");
             return "redirect:/admin/flights";
